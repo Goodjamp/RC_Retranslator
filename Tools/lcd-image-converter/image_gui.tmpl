@@ -1,0 +1,22 @@
+$(start_block_header)
+/*
+ * Image created to processing with Gui.h
+ */ 
+ 
+#include <stdint.h>
+#include "gui.h"
+$(end_block_header)
+$(start_block_images_table)
+static const GuiColor565 img$(doc_name_ws)[$(out_blocks_count)] = {
+    $(out_image_data)
+};
+
+void imgSrc$(doc_name_ws)(GuiImg *img)
+{
+    img->buff = img$(doc_name_ws);
+	img->w = $(out_image_width);
+	img->h = $(out_image_height);
+	img->size = $(out_blocks_count);
+}
+
+$(end_block_images_table)

@@ -1,0 +1,14 @@
+[
+{
+  "directory": "D:/Programing/MCU/ILI9341/ILI9341/Gui/Font/build",
+  "command": "C:\\PROGRA~1\\mingw64\\bin\\gcc.exe   -g -o CMakeFiles\\Test.dir\\main.c.obj -c D:\\Programing\\MCU\\ILI9341\\ILI9341\\Gui\\Font\\main.c",
+  "file": "D:/Programing/MCU/ILI9341/ILI9341/Gui/Font/main.c",
+  "output": "CMakeFiles/Test.dir/main.c.obj"
+},
+{
+  "directory": "D:/Programing/MCU/ILI9341/ILI9341/Gui/Font/build",
+  "command": "C:\\PROGRA~1\\mingw64\\bin\\gcc.exe   -g -o CMakeFiles\\Test.dir\\Font24.c.obj -c D:\\Programing\\MCU\\ILI9341\\ILI9341\\Gui\\Font\\Font24.c",
+  "file": "D:/Programing/MCU/ILI9341/ILI9341/Gui/Font/Font24.c",
+  "output": "CMakeFiles/Test.dir/Font24.c.obj"
+}
+]

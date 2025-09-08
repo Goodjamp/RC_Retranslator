@@ -1,0 +1,33 @@
+{
+    "files.associations": {
+        "stm32f4xx_hal.h": "c",
+        "systemclock.h": "c",
+        "debugservices.h": "c",
+        "stm32g4xx_ll_bus.h": "c",
+        "bsp.h": "c",
+        "gpio.h": "c",
+        "bspsystemclock.h": "c",
+        "stm32g4xx_ll_spi.h": "c",
+        "bspspidispili9341.h": "c",
+        "middlewaredisplay.h": "c",
+        "stdint.h": "c",
+        "portdisplay.h": "c",
+        "bspgpio.h": "c",
+        "gui.h": "c",
+        "font.h": "c",
+        "stm32g4xx.h": "c",
+        "stm32g4xx_ll_gpio.h": "c",
+        "stm32g4xx_ll_dma.h": "c",
+        "stm32g4xx_ll_exti.h": "c",
+        "stm32g4xx_hal.h": "c",
+        "services.h": "c",
+        "stm32g4xx_ll_dmamux.h": "c",
+        "freertosconfig.h": "c",
+        "task.h": "c",
+        "freertos.h": "c",
+        "projdefs.h": "c",
+        "supervisortask.h": "c",
+        "screenmgr.h": "c",
+        "stddef.h": "c"
+    }
+}
