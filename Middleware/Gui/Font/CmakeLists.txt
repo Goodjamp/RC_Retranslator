@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(Test CXX C ASM)
 
-add_executable(${CMAKE_PROJECT_NAME}  main.c Font24.c)
+add_executable(
+  ${CMAKE_PROJECT_NAME}
+  main.cpp Font16.c Font20.c Font24.c Font24_mono.c Font24_mono_1251.c Consolas24.c Consolas24_1251.c
+)

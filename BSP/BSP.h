@@ -4,15 +4,15 @@
 /***********************************************************/
 /********************        SPI        ********************/
 /***********************************************************/
-#define SPI_DISPLAY_ILI9341            1
+#define SPI_DISPLAY_ILI9341            2
 
 /***********************************************************/
 /********************        DMA        ********************/
 /***********************************************************/
 
 // ETH SPI (ILI9341)
-#define DMA_DISPLAY_ILI9341           1
-#define DMA_DISPLAY_ILI9341_CH        1
+#define DMA_DISPLAY_ILI9341           2
+#define DMA_DISPLAY_ILI9341_CH        5
 
 /*
  *     DMA1
@@ -37,20 +37,23 @@
 /********************       GPIO        ********************/
 /***********************************************************/
 // Display ILI9341
-#define GPIO_DISP_ILI9341_SPI_SCK_PORT        A
-#define GPIO_DISP_ILI9341_SPI_SCK_PIN         5
+#define GPIO_DISP_ILI9341_SPI_SCK_PORT        B
+#define GPIO_DISP_ILI9341_SPI_SCK_PIN         13
 #define GPIO_DISP_ILI9341_SPI_SCK_ALT_FUN     5
-#define GPIO_DISP_ILI9341_SPI_MOSI_PORT       A
-#define GPIO_DISP_ILI9341_SPI_MOSI_PIN        7
+#define GPIO_DISP_ILI9341_SPI_MOSI_PORT       B
+#define GPIO_DISP_ILI9341_SPI_MOSI_PIN        15
 #define GPIO_DISP_ILI9341_SPI_MOSI_ALT_FUN    5
-#define GPIO_DISP_ILI9341_SPI_CS_PORT         A
-#define GPIO_DISP_ILI9341_SPI_CS_PIN          4
-#define GPIO_DISP_ILI9341_RESET_PORT          A
-#define GPIO_DISP_ILI9341_RESET_PIN           3
-#define GPIO_DISP_ILI9341_CXD_PORT            A
-#define GPIO_DISP_ILI9341_CXD_PIN             6
+#define GPIO_DISP_ILI9341_SPI_CS_PORT         B
+#define GPIO_DISP_ILI9341_SPI_CS_PIN          12
+#define GPIO_DISP_ILI9341_RESET_PORT          B
+#define GPIO_DISP_ILI9341_RESET_PIN           1
+#define GPIO_DISP_ILI9341_CXD_PORT            B
+#define GPIO_DISP_ILI9341_CXD_PIN             2
+#define GPIO_DISP_ILI9341_LED_PORT            B
+#define GPIO_DISP_ILI9341_LED_PIN             0
 
 // DEBUG
+/*
 #define DEBUG_1_GPIO_PORT                     GPIOE
 #define DEBUG_1_GPIO_PIN                      LL_GPIO_PIN_0
 #define DEBUG_2_GPIO_PORT                     GPIOE
@@ -63,5 +66,5 @@
 #define DEBUG_5_GPIO_PIN                      LL_GPIO_PIN_2
 #define DEBUG_6_GPIO_PORT                     GPIOE
 #define DEBUG_6_GPIO_PIN                      LL_GPIO_PIN_3
-
+*/
 #endif // __BSP_H__

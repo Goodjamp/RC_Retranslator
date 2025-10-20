@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 
-#define BSP_DEBUG_ENABLE_PIN
+//#define BSP_DEBUG_ENABLE_PIN
 //#define BSP_DEBUG_ENABLE_LOG
 //#define BSP_DEBUG_ENABLE_STATISTIC
 //#define BSP_DEBUG_ENABLE_TIME_MES

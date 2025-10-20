@@ -27,7 +27,7 @@ typedef struct {
     void (*spiCs)(uint8_t state);
     void (*cxd)(uint8_t state);
     void (*reset)(uint8_t state);
-	void (*delayMs)(uint32_t delay);
+	  void (*delayMs)(uint32_t delay);
 } DisplayCb;
 
 typedef struct {

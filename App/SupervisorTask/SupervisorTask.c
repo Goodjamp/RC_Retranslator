@@ -33,10 +33,28 @@ static void supervisorTask(void *taskH)
 
     for(;;){
 
-        screenMgrUpdate(colorList[k++]);
-        if (k >= (sizeof(colorList) / sizeof(colorList[0]))) {
-            k = 0;
+        //screenMgrUpdate(colorList[k++]);
+        //if (k >= (sizeof(colorList) / sizeof(colorList[0]))) {
+        //    k = 0;
+        //}
+        static int  row = 0, col = 0;
+        //while(row < 8)
+        while(1)
+        {
+          if(col == 0 && row == 0) {
+            //Start_LCD_print();
+            break;
+          }
+          screenMgrUpdate(row, col, 1);
+          col += 1;
+          if(col >= 20)
+          {
+            col = 0;
+            row++;
+          }
         }
+        if(row >= 8) row = 0;
+
         vTaskDelay(40);
     }
 }

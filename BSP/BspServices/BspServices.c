@@ -107,6 +107,10 @@ bool bspServicesEnablePeriphery(void *pereph)
         LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
         break;
 
+    case LPUART1_BASE:
+        LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_LPUART1);
+        break;
+
     case TIM1_BASE:
         LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
         break;
@@ -334,6 +338,18 @@ void bspServicesDmaClearFlagTC(DMA_TypeDef *dma, uint32_t stream)
     clearFlag[stream](dma);
 }
 
+void bspServicesDmaClearFlagGI(DMA_TypeDef *dma, uint32_t stream)
+{
+    static void (*const clearFlag[])(DMA_TypeDef *) = {
+        LL_DMA_ClearFlag_GI1,
+        LL_DMA_ClearFlag_GI2, LL_DMA_ClearFlag_GI3,
+        LL_DMA_ClearFlag_GI4, LL_DMA_ClearFlag_GI5,
+        LL_DMA_ClearFlag_GI6,
+    };
+
+    clearFlag[stream](dma);
+}
+
 uint32_t bspServicesDmaIsActiveFlagTC(DMA_TypeDef *dma, uint32_t stream)
 {
     static uint32_t (*const getFlag[])(DMA_TypeDef *) = {
@@ -341,6 +357,18 @@ uint32_t bspServicesDmaIsActiveFlagTC(DMA_TypeDef *dma, uint32_t stream)
         LL_DMA_IsActiveFlag_TC2, LL_DMA_IsActiveFlag_TC3,
         LL_DMA_IsActiveFlag_TC4, LL_DMA_IsActiveFlag_TC5,
         LL_DMA_IsActiveFlag_TC6,
+    };
+
+    return getFlag[stream](dma);
+}
+
+uint32_t bspServicesDmaIsActiveFlagGI(DMA_TypeDef *dma, uint32_t stream)
+{
+    static uint32_t (*const getFlag[])(DMA_TypeDef *) = {
+        LL_DMA_IsActiveFlag_GI1,
+        LL_DMA_IsActiveFlag_GI2, LL_DMA_IsActiveFlag_GI3,
+        LL_DMA_IsActiveFlag_GI4, LL_DMA_IsActiveFlag_GI5,
+        LL_DMA_IsActiveFlag_GI6,
     };
 
     return getFlag[stream](dma);

@@ -185,7 +185,12 @@ GuiStatus guiFillColor(GuiColor888 color1, uint16_t x1, uint16_t x2, uint16_t y1
     return guiFillregion(color1, x1, y1, x2 - x1 + 1, y2 - y1 + 1);
 }
 
-GuiStatus guiAddText(const char *string)
+GuiStatus __attribute__((always_inline)) guiAddText(const char *string)
+{
+  return  guiAddTextN(string, -1);
+}
+
+GuiStatus guiAddTextN(const char *string, int str_len_)
 {
     Symbol symbol;
     uint32_t framePixelCnt = 0;
@@ -193,19 +198,23 @@ GuiStatus guiAddText(const char *string)
     Utf8Code utf8Code;
 
     while (*string) {
+        if(str_len_ == 0) break;
+        if(str_len_ > 0) str_len_--;
         utf8Code = 0;
         /*
          * Decode UTF8 symbol
          */
-        if ((*string & 0xC0) == 0xC0) {
-            utf8Code = (Utf8Code)((*string << 8) | *(string + 1));
-            string += 2;
-        } else {
+        //if ((*string & 0xC0) == 0xC0) {
+        //    utf8Code = (Utf8Code)((*string << 8) | *(string + 1));
+        //    string += 2;
+        //} else {
             utf8Code = (Utf8Code)(*string);
             string++;
-        }
+        //}
         if (guiFontGetSymbol(utf8Code, text.size, &symbol) != GUI_STATUS_OK) {
-            continue;
+            if (guiFontGetSymbol(' ', text.size, &symbol) != GUI_STATUS_OK) {
+                continue;
+            }
         };
         framePixelCnt = symbol.h * symbol.w;
 
@@ -222,13 +231,14 @@ GuiStatus guiAddText(const char *string)
          * It's much more efficient to use a temporary buffer to store a chunk of the decompressed
          * frame and send it immediately as a data part of the frame, with a size equal to the chunk size.
          */
-#define BLOCK_SIZE    254
+#define BLOCK_SIZE   254
         uint32_t blockCnt = (framePixelCnt + BLOCK_SIZE - 1) / BLOCK_SIZE;
         uint32_t i = 0;
         uint32_t n = 0;
         uint32_t tempPixelCnt = (framePixelCnt > chunkPixelCnt) ? chunkPixelCnt : framePixelCnt;
         for (uint32_t k = 0; k < blockCnt; k++) {
-            uint32_t tempBlokSize = (k == (blockCnt - 1)) ? (framePixelCnt % BLOCK_SIZE) : BLOCK_SIZE;
+            uint32_t rm = (framePixelCnt % BLOCK_SIZE);
+            uint32_t tempBlokSize = (k == (blockCnt - 1)) ? (rm != 0 ? rm : BLOCK_SIZE) : BLOCK_SIZE;
             for (uint32_t m = 0; m < tempBlokSize; m++) {
                 if (m == symbol.frame[i]) {
                     // set text color
