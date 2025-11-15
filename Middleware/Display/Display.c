@@ -5,10 +5,11 @@
 #include "Display.h"
 
 /*
- * The code bellow implement the ILI9341 display
+ * The code bellow implement driver for the ILI9341 display
  */
+#define DISPLAY_COLOR_888_TO_565(R,G,B)    ( ((0xFF &((R & 0xF8) | (G >> 5))) << 8) | (0xFF & (((G & 0x1C) << 3) | (B >> 3))) )
 
-#define FILL_ARRAY_1(X, X0)                                         X[0] = (X0)
+ #define FILL_ARRAY_1(X, X0)                                        X[0] = (X0)
 #define FILL_ARRAY_2(X, X0, X1)                                     X[0] = (X0); X[1] = (X1)
 #define FILL_ARRAY_3(X, X0, X1, X2)                                 X[0] = (X0); X[1] = (X1); X[2] = (X2)
 #define FILL_ARRAY_4(X, X0, X1, X2, X3)                             X[0] = (X0); X[1] = (X1); X[2] = (X2); X[3] = X3
@@ -47,8 +48,8 @@ typedef enum {
     DISPLAY_ILI9341_COMMAND_GAMMA_SET            = 0x26, // Set gamma curve
     DISPLAY_ILI9341_COMMAND_DISPLAY_OFF          = 0x28, // Turn display OFF
     DISPLAY_ILI9341_COMMAND_DISPLAY_ON           = 0x29, // Turn display ON
-    DISPLAY_ILI9341_COMMAND_COLUMN_ADDRESS_SET   = 0x2A, // Set column address range
-    DISPLAY_ILI9341_COMMAND_PAGE_ADDRESS_SET     = 0x2B, // Set page address range
+    DISPLAY_ILI9341_COMMAND_COLUMN_ADDRESS_SET   = 0x2A, // Set column address range (X)
+    DISPLAY_ILI9341_COMMAND_PAGE_ADDRESS_SET     = 0x2B, // Set page address range (Y)
     DISPLAY_ILI9341_COMMAND_MEMORY_WRITE         = 0x2C, // Write memory
     DISPLAY_ILI9341_COMMAND_COLOR_SET            = 0x2D, // Initiate memory color
     DISPLAY_ILI9341_COMMAND_MEMORY_READ          = 0x2E, // Read memory
@@ -78,17 +79,17 @@ typedef enum {
 /******    MADCTL   *********/
 /****************************/
 #define ILI9341_DEF_MADCTL           0x00U
-#define ILI9341_OFFSET_MADCTL_MY     0x7U
+#define ILI9341_OFFSET_MADCTL_MY     0x7U  // Row address order: 0 top to bottom, 1 bottom to top
 #define ILI9341_MASK_MADCTL_MY       (1 << ILI9341_OFFSET_MADCTL_MY)
-#define ILI9341_OFFSET_MADCTL_MX     0x6U
+#define ILI9341_OFFSET_MADCTL_MX     0x6U // Column address order: 0 Left to Right, 1 Right to Left
 #define ILI9341_MASK_MADCTL_MX       (1 << ILI9341_OFFSET_MADCTL_MX)
-#define ILI9341_OFFSET_MADCTL_MV     0x5U
+#define ILI9341_OFFSET_MADCTL_MV     0x5U // Row/column exchange: 0 Normal Mode, 1 Reverse Mode
 #define ILI9341_MASK_MADCTL_MV       (1 << ILI9341_OFFSET_MADCTL_MV)
-#define ILI9341_OFFSET_MADCTL_ML     0x4U
+#define ILI9341_OFFSET_MADCTL_ML     0x4U // Vertical refresh: 0 Top to Bottom, 1 Bottom to Top
 #define ILI9341_MASK_MADCTL_ML       (1 << ILI9341_OFFSET_MADCTL_ML)
-#define ILI9341_OFFSET_MADCTL_BGR    0x3U
+#define ILI9341_OFFSET_MADCTL_BGR    0x3U  // RGB/BGR orde: 0 RGB, 1 BGR
 #define ILI9341_MASK_MADCTL_BGR      (1 << ILI9341_OFFSET_MADCTL_BGR)
-#define ILI9341_OFFSET_MADCTL_MH     0x2U
+#define ILI9341_OFFSET_MADCTL_MH     0x2U  // Horizontal refresh: 0  Left to Right, 1 Right to Left
 #define ILI9341_MASK_MADCTL_MH       (1 << ILI9341_OFFSET_MADCTL_MH)
 
 /**
@@ -106,6 +107,15 @@ static bool isDisplayInit = false;
 static bool isAreaUpdate = false;
 static uint32_t displayWidth = DISPLAY_DIMENSION_LESS; // max X coord
 static uint32_t displayHeight = DISPLAY_DIMENSION_MACH; // max Y coord
+static DisplayDefaultState dispDefaultState = {
+    .isBgr = true,
+    .isVertical = true,
+};
+
+static inline uint32_t displayGetMax(uint32_t x, uint32_t y)
+{
+    return x > y ? x : y;
+}
 
 static void displaySendCommand(uint8_t command)
 {
@@ -279,7 +289,7 @@ DisplayStatus displayInit(DisplayCb cb)
         || displayCb .txU16 == NULL) {
         return DISPLAY_STATUS_ERROR_CB;
     }
-    
+
     displayInitSequency();
     middlewareDisplaySet16Bitcolor();
     isDisplayInit = true;
@@ -318,58 +328,154 @@ DisplayStatus displaySetArea(uint16_t x, uint16_t y, uint16_t width, uint16_t he
         return DISPLAY_STATUS_ERROR_Y_OUT_OF_RANGE;
     }
 
+
     if (y2 > displayHeight) {
         return DISPLAY_STATUS_ERROR_HEIGHT_OUT_OF_RANGE;
     }
-   
-    uint8_t data[4] = {0xFF & (y >> 8) , 0xFF & (y), 0xFF & (y2 >> 8) , 0xFF & (y2)};
-    displaySendCommand(DISPLAY_ILI9341_COMMAND_PAGE_ADDRESS_SET);
+
+    uint8_t data[4] = {0xFF & (x >> 8), 0xFF & (x), 0xFF & (x2 >> 8) , 0xFF & (x2)};
+    displaySendCommand(DISPLAY_ILI9341_COMMAND_COLUMN_ADDRESS_SET);
     displaySendData(data, sizeof(data));
 
-    FILL_ARRAY_4(data, 0xFF & (x >> 8), 0xFF & (x), 0xFF & (x2 >> 8) , 0xFF & (x2));
-    displaySendCommand(DISPLAY_ILI9341_COMMAND_COLUMN_ADDRESS_SET);
+    FILL_ARRAY_4(data, 0xFF & (y >> 8), 0xFF & (y), 0xFF & (y2 >> 8) , 0xFF & (y2));
+    displaySendCommand(DISPLAY_ILI9341_COMMAND_PAGE_ADDRESS_SET);
     displaySendData(data, sizeof(data));
 
     isAreaUpdate = true;
 
-/*
-    FILL_ARRAY_4(data, 0xFF & (y >> 8) , 0xFF & (y), 0xFF & (y2 >> 8) , 0xFF & (y2));
-    displaySendCommand(DISPLAY_ILI9341_COMMAND_PAGE_ADDRESS_SET);
-    displaySendData(data, sizeof(data));
-
-    uint8_t data[4] = {0xFF & (x >> 8) , 0xFF & (x), 0xFF & (x2 >> 8) , 0xFF & (x2)};
-    displaySendCommand(DISPLAY_ILI9341_COMMAND_COLUMN_ADDRESS_SET);
-    displaySendData(data, sizeof(data));
-*/
     return DISPLAY_STATUS_OK;
 }
 
-DisplayStatus displaySetOrientation(DisplayOrientation orientation)
+static void displayTestDrawRec(MiddlewareDisplayColor565 *buff, uint32_t x, uint32_t y, uint32_t h, uint32_t w,
+                               MiddlewareDisplayColor565 color)
 {
-    if (orientation >= DISPLAY_ORIENTATION_CNT) {
+    uint32_t cnt = 0;
+    for (; cnt < w * h; cnt++) {
+        buff[cnt] = color;
+    }
+    displaySetArea(x, y, w, h);
+    displayPutPixel565(buff, w * h);
+}
+
+void displayDefaultStatenTest(bool orientation, bool orderX, bool orderY)
+{
+    uint8_t settings[1];
+    FILL_ARRAY_1(settings, ILI9341_DEF_MADCTL);
+    FILL_ARRAY_1(settings, ILI9341_DEF_MADCTL);
+    if (orientation) {
+        ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+    } else {
+        ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+    }
+    if (orderX) {
+        ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MX);
+    } else {
+        ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MX);
+    }
+    if (orderY) {
+        ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MY);
+    } else {
+        ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MY);
+    }
+
+    displaySendCommand(DISPLAY_ILI9341_COMMAND_MEMORY_ACCESS_CTRL);
+    displaySendData(settings, sizeof(settings));
+
+    #define DISPLAY_TEST_H      3
+    #define DISPLAY_TEST_W_1    10U
+    #define DISPLAY_TEST_W_2    15U
+    MiddlewareDisplayColor565 buffDisp[DISPLAY_TEST_H * DISPLAY_TEST_W_2];
+    displayTestDrawRec(buffDisp, 10, 10, DISPLAY_TEST_H, DISPLAY_TEST_W_1, DISPLAY_COLOR_888_TO_565(255, 0, 0));
+    displayTestDrawRec(buffDisp, 10, 30, DISPLAY_TEST_H, DISPLAY_TEST_W_2, DISPLAY_COLOR_888_TO_565(0, 255, 0));
+}
+
+void displaySetDefaultState(DisplayDefaultState defaultState)
+{
+    dispDefaultState = defaultState;
+}
+
+DisplayStatus displaySetConfig(DisplayConfig config)
+{
+    if (config.orientation >= DISPLAY_ORIENTATION_CNT) {
         return DISPLAY_STATUS_ERROR_ORIENTATION_OUT_OF_RANGE;
     }
     /*
-     * Set logical orientation 
+     * Set logical orientation
      */
-    displayWidth = (orientation == DISPLAY_ORIENTATION_VERTICAL)
+    displayWidth = (config.orientation == DISPLAY_ORIENTATION_VERTICAL)
                    ? DISPLAY_DIMENSION_LESS : DISPLAY_DIMENSION_MACH;
-    displayHeight = (orientation == DISPLAY_ORIENTATION_VERTICAL)
+    displayHeight = (config.orientation == DISPLAY_ORIENTATION_VERTICAL)
                    ? DISPLAY_DIMENSION_MACH : DISPLAY_DIMENSION_LESS;
-    
+
     /*
-     * Set physical display RAM presentation 
+     * Set display orientation
      */
     uint8_t settings[1];
     FILL_ARRAY_1(settings, ILI9341_DEF_MADCTL);
-    if (orientation == DISPLAY_ORIENTATION_HORIZONTAL) {
-        ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+    if (dispDefaultState.isVertical) {
+        if (config.orientation == DISPLAY_ORIENTATION_VERTICAL) {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+        } else {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+        }
+    } else { // default (MV = 0) - horizontal
+        if (config.orientation == DISPLAY_ORIENTATION_VERTICAL) {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+        } else {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MV);
+        }
     }
 
     /*
-     * Set BGR color order by the default
+     * Set X order
      */
-    ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_BGR);
+    if (config.orientation == DISPLAY_ORIENTATION_VERTICAL) {
+        if (config.xOrder) {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MX);
+        } else {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MX);
+        }
+    } else {
+        if (config.xOrder) {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MY);
+        } else {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MY);
+        }
+    }
+
+    /*
+     * Set Y order
+     */
+    if (config.orientation == DISPLAY_ORIENTATION_VERTICAL) {
+        if (config.yOrder) {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MY);
+        } else {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MY);
+        }
+    } else {
+        if (config.yOrder) {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_MX);
+        } else {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_MX);
+        }
+    }
+
+    /*
+     * Set BGR color order
+     */
+    if (dispDefaultState.isBgr) {
+        if (config.colorOrder == DISPLAY_COLOR_ORDER_BGR) {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_BGR);
+        } else {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_BGR);
+        }
+    } else {
+        if (config.colorOrder == DISPLAY_COLOR_ORDER_BGR) {
+            ILI9341_SET_MASK(settings[0], ILI9341_MASK_MADCTL_BGR);
+        } else {
+            ILI9341_CLEAR_MASK(settings[0], ILI9341_MASK_MADCTL_BGR);
+        }
+    }
 
     displaySendCommand(DISPLAY_ILI9341_COMMAND_MEMORY_ACCESS_CTRL);
     displaySendData(settings, sizeof(settings));

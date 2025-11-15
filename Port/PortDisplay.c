@@ -148,7 +148,16 @@ void portDisplayInit(void)
     bspSpiDispIli9341Init(spiDisplayCb);
     displayInit(middlewareDisplayCb);
 
-    displaySetOrientation(DISPLAY_ORIENTATION_HORIZONTAL);
+    /*
+     * Display test to get default display settings. Uncoment code below in case of start using new display
+     */
+    // displayDefaultStatenTest(false, false, false);
+    // while(1){};
+    displaySetDefaultState((DisplayDefaultState){.isVertical = false, .isBgr = false});
+    displaySetConfig((DisplayConfig){.orientation = DISPLAY_ORIENTATION_HORIZONTAL,
+                                     .xOrder = true,
+                                     .yOrder = false,
+                                     .colorOrder = DISPLAY_COLOR_ORDER_RGB});
 
     /*
      * Init GUI interface
