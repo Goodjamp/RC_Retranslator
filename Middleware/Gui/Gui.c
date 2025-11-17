@@ -23,7 +23,7 @@ static struct {
 } text;
 
 
-#define GUI_COLOR_888_TO_565(R,G,B)    (       ((0xFF &((R & 0xF8) | (G >> 5))) << 8)  |   (0xFF & (((G & 0x1C) << 3) | (B >> 3)))        )
+#define GUI_COLOR_888_TO_565(R,G,B)    ( ((0xFF &((R & 0xF8) | (G >> 5))) << 8) | (0xFF & (((G & 0x1C) << 3) | (B >> 3))) )
 
 static GuiStatus guiFillregion(GuiColor888 color, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
