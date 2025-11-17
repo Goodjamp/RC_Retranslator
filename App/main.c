@@ -6,6 +6,15 @@
 #include "BspGpio.h"
 #include "SupervisorTask.h"
 
+enum 
+{ LCD_RAM_W = 20
+, LCD_RAM_H = 8
+, LCD_RAM_len = LCD_RAM_W * LCD_RAM_H 
+};
+
+uint8_t    LCD_RAM[LCD_RAM_len + 1];
+uint8_t    LCD_COLOR[LCD_RAM_len + 1];
+
 
 void main(void)
 {

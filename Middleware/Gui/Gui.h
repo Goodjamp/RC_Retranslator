@@ -46,6 +46,7 @@ typedef enum {
     GUI_FONT_SIZE_16,
     GUI_FONT_SIZE_20,
     GUI_FONT_SIZE_24,
+    GUI_FONT_SIZE_24_mono,
     GUI_FONT_SIZE_CNT,
 } GuiFontSize;
 
@@ -57,6 +58,8 @@ GuiStatus guiAddImage(GuiImg *img, uint16_t x, uint16_t y);
 GuiStatus guiSetCursor(uint16_t x, uint16_t y);
 GuiStatus guiSetFont(GuiFontSize fontSize);
 GuiStatus guiSetTextColor(GuiColor888 textColor, GuiColor888 backgroundColor);
-GuiStatus guiAddText(const char *string);
+GuiStatus guiAddTextN(const char *string, int str_len_);
+
+GuiStatus __attribute__((always_inline)) guiAddText(const char *string);
 
 #endif

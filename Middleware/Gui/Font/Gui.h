@@ -25,6 +25,7 @@ typedef enum {
     GUI_FONT_SIZE_16,
     GUI_FONT_SIZE_20,
     GUI_FONT_SIZE_24,
+    GUI_FONT_SIZE_24_mono,
     GUI_FONT_SIZE_CNT,
 } GuiFontSize;
 

@@ -4,7 +4,8 @@
 #include "Gui.h"
 
 void screenMgrInit(void);
+void screenMgrPostInit(void);
 
-void screenMgrUpdate(GuiColor888 color);
+void screenMgrUpdate(int y_, int x_, int n_);//(GuiColor888 color);
 
 #endif

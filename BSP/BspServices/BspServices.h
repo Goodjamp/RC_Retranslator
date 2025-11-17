@@ -57,8 +57,18 @@ void bspServicesDmaClearFlagFE(DMA_TypeDef *dma, uint32_t stream);
 void bspServicesDmaClearFlagTC(DMA_TypeDef *dma, uint32_t stream);
 
 /**
+ * DMA global interrupt clear flag
+ */
+void bspServicesDmaClearFlagGI(DMA_TypeDef *dma, uint32_t stream);
+
+/**
  * Return different than 0 if TC flag active
  */
 uint32_t bspServicesDmaIsActiveFlagTC(DMA_TypeDef *dma, uint32_t stream);
+
+/**
+ * Return different than 0 if GI flag active
+ */
+uint32_t bspServicesDmaIsActiveFlagGI(DMA_TypeDef *dma, uint32_t stream);
 
 #endif // __BSP_SERVICES_H__

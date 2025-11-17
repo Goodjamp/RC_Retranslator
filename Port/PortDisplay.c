@@ -41,6 +41,7 @@ static void portDisplaySpiTxComplete(void)
     /*
      * Implement Unblock SPI communication  (Give RTOS semaphore or )
      */
+
     isDisplayTxActive = false;
 }
 
@@ -51,6 +52,8 @@ static void portDisplayTxU8(uint8_t *data, uint32_t size)
      */
     while(isDisplayTxActive) {
     }
+    bspSpiDisplayIli9341WaitBusy();
+    
     isDisplayTxActive = true;
 
     bspSpiDispIli9341TxU8(data, size);
@@ -71,6 +74,8 @@ static void portDisplayTxU16(uint16_t *data, uint32_t size)
      */
     while(isDisplayTxActive) {
     }
+    bspSpiDisplayIli9341WaitBusy();
+    
     isDisplayTxActive = true;
 
     bspSpiDispIli9341TxU16(data, size);
@@ -84,6 +89,8 @@ static void portDisplayTxU16(uint16_t *data, uint32_t size)
     bspSpiDisplayIli9341WaitBusy();
 }
 
+#pragma push
+#pragma O0
 __attribute__((optimize("O0")))
 static void delayMs(uint32_t delay)
 {
@@ -91,10 +98,11 @@ static void delayMs(uint32_t delay)
     while(delay--) {
     }
 }
+#pragma pop
 
 static uint8_t * guiMalloc(uint32_t *memSize)
 {
-#define GUI_MEM_SIZE    1024
+#define GUI_MEM_SIZE    2048
     static uint8_t guiMemPool[GUI_MEM_SIZE];
 
     *memSize = GUI_MEM_SIZE;

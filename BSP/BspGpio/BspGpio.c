@@ -25,6 +25,9 @@ static const GpioDef gpioOutList[] = {
     [BSP_GPIO_OUT_DISP_ILI9341_RESET] = {CONCAT_2_WORDS(GPIO, GPIO_DISP_ILI9341_RESET_PORT),
                                          CONCAT_2_WORDS(LL_GPIO_PIN_, GPIO_DISP_ILI9341_RESET_PIN)
     },
+    [BSP_GPIO_OUT_DISP_ILI9341_LED] = {CONCAT_2_WORDS(GPIO, GPIO_DISP_ILI9341_LED_PORT),
+                                       CONCAT_2_WORDS(LL_GPIO_PIN_, GPIO_DISP_ILI9341_LED_PIN)
+    },
 };
 
 static const GpioDef gpioInList[] = {

@@ -25,4 +25,6 @@ bool bspSpiDisplayIli9341WaitBusy(void);
 BspSpiDispIli9341Res bspSpiDispIli9341TxU8(uint8_t buff[], uint32_t size);
 BspSpiDispIli9341Res bspSpiDispIli9341TxU16(uint16_t buff[], uint32_t size);
 
+void bspSpiDispIli9341SetSpiBaudRatePrescaler(uint32_t BaudRate);
+
 #endif

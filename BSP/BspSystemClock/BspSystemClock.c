@@ -87,7 +87,7 @@ void bspSystemClockInit(void)
     while(LL_RCC_HSE_IsReady() != 1) {
     }
 
-    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_2, 85, LL_RCC_PLLR_DIV_2);
+    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_4, 85, LL_RCC_PLLR_DIV_2);
     LL_RCC_PLL_EnableDomain_SYS();
     LL_RCC_PLL_Enable();
     /* Wait till PLL is ready */

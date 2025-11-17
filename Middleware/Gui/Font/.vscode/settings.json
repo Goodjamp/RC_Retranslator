@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "font.h": "c",
-        "gui.h": "c"
+        "gui.h": "c",
+        "string": "cpp",
+        "text_encoding": "cpp",
+        "typeinfo": "cpp"
     }
 }

@@ -11,6 +11,7 @@
 #include "BSP.h"
 #include "BspDebug.h"
 #include "BspServices.h"
+#include "BspGpio.h"
 
 /*
  * The counter below provides a timeout for a 16 + 1 bit delay.
@@ -26,7 +27,8 @@ const static struct {
     uint32_t dmaReqSrc;
     struct {
         GPIO_TypeDef *port;
-        uint32_t pin;        
+        uint32_t pin;
+        uint32_t  alt_fnc;      
     } gpio[2];
 } settings = {
     .spi = CONCAT_2_WORDS(SPI, SPI_DISPLAY_ILI9341),
@@ -34,8 +36,8 @@ const static struct {
     .dmaChannel = CONCAT_2_WORDS(LL_DMA_CHANNEL_, DMA_DISPLAY_ILI9341_CH),
     .dmaReqSrc = CONCAT_3_WORDS(LL_DMAMUX_REQ_SPI, SPI_DISPLAY_ILI9341,_TX),
     .gpio = {
-        {CONCAT_2_WORDS(GPIO, GPIO_DISP_ILI9341_SPI_SCK_PORT), CONCAT_2_WORDS(LL_GPIO_PIN_, GPIO_DISP_ILI9341_SPI_SCK_PIN)},
-        {CONCAT_2_WORDS(GPIO, GPIO_DISP_ILI9341_SPI_MOSI_PORT), CONCAT_2_WORDS(LL_GPIO_PIN_, GPIO_DISP_ILI9341_SPI_MOSI_PIN)},
+        {CONCAT_2_WORDS(GPIO, GPIO_DISP_ILI9341_SPI_SCK_PORT), CONCAT_2_WORDS(LL_GPIO_PIN_, GPIO_DISP_ILI9341_SPI_SCK_PIN), CONCAT_2_WORDS(LL_GPIO_AF_, GPIO_DISP_ILI9341_SPI_SCK_ALT_FUN)},
+        {CONCAT_2_WORDS(GPIO, GPIO_DISP_ILI9341_SPI_MOSI_PORT), CONCAT_2_WORDS(LL_GPIO_PIN_, GPIO_DISP_ILI9341_SPI_MOSI_PIN), CONCAT_2_WORDS(LL_GPIO_AF_, GPIO_DISP_ILI9341_SPI_MOSI_ALT_FUN)},
     }
 };
 
@@ -71,6 +73,7 @@ static void spiDisplayIli9341InitGpio(void)
 
     for (uint32_t k = 0; k < ARRAY_SIZE(settings.gpio); k++) {
         gpioInitStruct.Pin = settings.gpio[k].pin;
+        gpioInitStruct.Alternate = settings.gpio[k].alt_fnc;
         bspServicesEnablePeriphery(settings.gpio[k].port);
         LL_GPIO_Init(settings.gpio[k].port, &gpioInitStruct);
     }
@@ -112,7 +115,7 @@ static void spiDisplayIli9341InitSpi(void)
         .DataWidth = LL_SPI_DATAWIDTH_8BIT,
         .ClockPolarity = LL_SPI_POLARITY_LOW,
         .ClockPhase = LL_SPI_PHASE_1EDGE,
-        .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV4,
+        .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV8,
         .BitOrder = LL_SPI_MSB_FIRST,
         .CRCCalculation = LL_SPI_CRCCALCULATION_DISABLE,
     };
@@ -125,6 +128,11 @@ static void spiDisplayIli9341InitSpi(void)
     LL_SPI_Enable(settings.spi);
 }
 
+void bspSpiDispIli9341SetSpiBaudRatePrescaler(uint32_t BaudRate)
+{
+    LL_SPI_SetBaudRatePrescaler(settings.spi, BaudRate);
+}
+
 BspSpiDispIli9341Res bspSpiDispIli9341Init(BspSpiDispIli9341Cb cb)
 {
     callbacks = cb;
@@ -132,6 +140,7 @@ BspSpiDispIli9341Res bspSpiDispIli9341Init(BspSpiDispIli9341Cb cb)
     spiDisplayIli9341InitGpio();
     spiDisplayIli9341InitDma();
     spiDisplayIli9341InitSpi();
+    bspGpioSet(BSP_GPIO_OUT_DISP_ILI9341_LED);
 
     return BSP_SPI_DISP_ILI9341_RES_OK;
 }
