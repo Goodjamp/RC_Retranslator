@@ -1,3 +1,0 @@
-D:/DDT-WORK/Projects/STM/STM32_G4/RC_Retranslator/Middleware/Gui/Font/build/CMakeFiles/Test.dir
-D:/DDT-WORK/Projects/STM/STM32_G4/RC_Retranslator/Middleware/Gui/Font/build/CMakeFiles/edit_cache.dir
-D:/DDT-WORK/Projects/STM/STM32_G4/RC_Retranslator/Middleware/Gui/Font/build/CMakeFiles/rebuild_cache.dir
